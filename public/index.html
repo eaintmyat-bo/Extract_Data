@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Extractor</title>
+  </head>
+  <body>
+    <div style="font-size: 12px">
+      Enter Filename: <input type="file" id="inpFile" />
+      <button type="button" id="btnUpload">Upload</button> <br /><br />
+      Enter Data to Search: <input type="text" id="searchText" />
+      <button type="button" id="btnSearch">Search</button> <br />
+    </div>
+    <br />
+    <br />
+    <textarea
+      style="width: 450px; height: 100px"
+      id="resultText"
+      placeholder="The extracted text will appear here"
+    ></textarea>
+    <script>
+      const inpFile = document.getElementById("inpFile");
+      const btnUpload = document.getElementById("btnUpload");
+      const resultText = document.getElementById("resultText");
+      const btnSearch = document.getElementById("btnSearch");
+      const searchText = document.getElementById("searchText");
+
+      btnUpload.addEventListener("click", () => {
+        const formData = new FormData();
+
+        formData.append("pdfFile", inpFile.files[0]);
+
+        fetch("/extract-text", {
+          method: "post",
+          body: formData,
+        })
+          .then((response) => {
+            return response.text();
+          })
+          .then((extractedText) => {
+            resultText.value = extractedText;
+          });
+      });
+
+      btnSearch.addEventListener("click", () => {
+        if (searchText.value) {
+          fetch(`/search-text?search=${searchText.value}`, {
+            method: "get",
+          })
+            .then((response) => {
+              return response.text();
+            })
+            .then((searchedText) => {
+              resultText.value = searchedText;
+            });
+        }
+      });
+    </script>
+  </body>
+</html>
